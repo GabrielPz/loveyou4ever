@@ -5,4 +5,3 @@ function generateJwtSecret() {
 }
 
 const jwtSecret = generateJwtSecret();
-console.log(jwtSecret);

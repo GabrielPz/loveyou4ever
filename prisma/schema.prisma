@@ -7,84 +7,50 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Job {
-  ADVOGADO
-  COMERCIARIO
-  EMPRESARIO
-  ESTUDANTE
-  FUNCIONARIO_PUBLICO
-  COMERCIANTE
-  OUTROS
-}
-
 enum Role {
-  ADMIN
   USER
+  ADMIN
 }
 
-enum Type {
-  TRUE_FALSE
-  MULTIPLE_CHOICE
+enum Plans {
+  BASIC
+  PREMIUM
+  SUPER_PREMIUM
 }
 
 model User {
-  id         String    @id @default(uuid())
-  name       String
-  email      String    @unique
-  password   String
-  job        Job       @default(ADVOGADO)
-  role       Role      @default(USER)
-  paid       Boolean   @default(false)
-  accessTill DateTime?
-
-  createdAt      DateTime         @default(now()) @map("created_at")
-  updatedAt      DateTime         @updatedAt @map("updated_at")
-  forgotPassword forgotPassword[]
+  id            String          @id @default(uuid())
+  email         String          @unique
+  password      String
+  role          Role            @default(USER)
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+  Relationships Relationships[]
 
   @@map("users")
 }
 
-model Payments {
-  id        String   @id @default(uuid())
+model Relationships {
+  id        String     @id @default(uuid())
   userId    String
-  amount    Float
-  status    String   @default("pending")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  paymentId String
+  user      User       @relation(fields: [userId], references: [id])
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+  Payments  Payments[]
+
+  @@map("relationhips")
+}
+
+model Payments {
+  id           String        @id @default(uuid())
+  relationShip String
+  relationship Relationships @relation(fields: [relationShip], references: [id], onDelete: Cascade)
+  plan         Plans         @default(BASIC)
+  amount       Float
+  status       String        @default("pending")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
 
   @@map("payments")
-}
-
-model Questions {
-  id           String   @id @default(uuid())
-  categoryId   String   @map("category_id")
-  type         Type     @default(TRUE_FALSE)
-  question     String
-  choices      String[]
-  category     Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  correctAwser String
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@map("questions")
-}
-
-model Category {
-  id        String      @id @default(uuid())
-  name      String      @unique
-  Questions Questions[] @ignore
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@map("categories")
-}
-
-model forgotPassword {
-  id      String   @id @default(cuid())
-  token   String
-  expires DateTime
-  userId  String   @unique
-  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
