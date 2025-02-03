@@ -25,6 +25,11 @@ app.register(fastifyCors, {
 app.register(fastifyMulter.contentParser);
 app.setErrorHandler(errorHandler);
 
+app.addContentTypeParser('*', { parseAs: 'buffer' }, (req, body, done) => {
+  req.rawBody = body; // ✅ Armazena o rawBody para uso no Stripe
+  done(null, body);
+});
+
 app.register(fastifySwagger, {
   swagger: {
     consumes: ["application/json", "multipart/form-data"],

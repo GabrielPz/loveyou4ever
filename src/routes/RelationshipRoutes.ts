@@ -31,7 +31,7 @@ export async function relationshipRoutes(app: FastifyInstance) {
         tags: ["Relationships"],
         consumes: ["multipart/form-data"],
         response: {
-          201: relationshipResponseSchema.extend({ id: z.string().uuid() }),
+          201: z.object({ redirect_url: z.string() }),
           400: z.object({ message: z.string() }),
         },
       },

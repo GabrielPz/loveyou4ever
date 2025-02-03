@@ -5,6 +5,7 @@ import multer from "multer";
 import { uploadToFirebase } from "../services/FirebaseServices";
 import {userService} from "../services/UserServices";
 import {imageServices} from "../services/ImageServices";
+import {paymentService} from "../services/PaymentServices";
 import { Role } from "@prisma/client";
 const {
   createUser
@@ -12,6 +13,9 @@ const {
 const {
   createImage
 } = imageServices;
+const {
+  createPayment
+} = paymentService;
 
 const upload = multer({ storage: multer.memoryStorage() });
 interface MulterFile {
@@ -87,8 +91,16 @@ export const RelationshipController = {
       console.log(error);
       return reply.status(400).send({ message: "Erro ao criar imagem" });
     }
-    const createdRelationship = await relationshipServices.getRelationshipById(relationShipId);
-    return reply.status(201).send(createdRelationship);
+
+    try{
+      const paymentResult = await createPayment({
+        relationshipId: relationShipId,
+      });
+      return reply.status(201).send({ redirect_url:  paymentResult.redirect_url});
+    }catch(err){
+      console.log(err);
+      return reply.status(400).send({ message: "Erro ao criar link de pagamento" });
+    }
   },
 
 
