@@ -3,10 +3,13 @@ import { Relationships } from "@prisma/client";
 import { RelationshipDTO } from "../schemas/RelationshipSchema";
 
 export const relationshipServices = {
-  async createRelationShip(data: RelationshipDTO): Promise<Relationships> {
+  async createRelationShip(data: RelationshipDTO, userId: string): Promise<Relationships> {
     return prisma.relationships.create({
       data: {
-        ...data,
+        description: data.description,
+        Plan: data.plan,
+        videoLink: data.videoLink,
+        userId: userId,
       },
     });
   },
@@ -25,6 +28,11 @@ export const relationshipServices = {
 
   async getAllRelationships(): Promise<Relationships[]> {
     return prisma.relationships.findMany({
+      include: {
+        images: true,
+        Payments: true,
+        user: true,
+      },
       orderBy: {
         createdAt: "desc",
       },

@@ -2,12 +2,12 @@ import { initializeApp } from "firebase/app";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: process.env.FIREBASE_AUTHDOMAIN,
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.FIREBASE_APP_ID
+  apiKey: "AIzaSyCZzMo1ldTjvzyhWY9HuzSlMKhrRDAfuT4",
+  authDomain: "loveyou4ever-3e32c.firebaseapp.com",
+  projectId: "loveyou4ever-3e32c",
+  storageBucket: "loveyou4ever-3e32c.firebasestorage.app",
+  messagingSenderId: "80915370816",
+  appId: "1:80915370816:web:4e3ba54a8f6f8d7a5ba0a5"
 };
 
 const app = initializeApp(firebaseConfig);

@@ -1,14 +1,96 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { relationshipServices } from "../services/RelationshipServices";
-import { userSchema } from "../schemas/UserSchemas";
 import { relationshipSchema } from "../schemas/RelationshipSchema";
+import multer from "multer";
+import { uploadToFirebase } from "../services/FirebaseServices";
+import {userService} from "../services/UserServices";
+import {imageServices} from "../services/ImageServices";
+import { Role } from "@prisma/client";
+const {
+  createUser
+} = userService;
+const {
+  createImage
+} = imageServices;
+
+const upload = multer({ storage: multer.memoryStorage() });
+interface MulterFile {
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  size: number;
+  buffer: Buffer;
+}
+
+interface MulterRequest extends FastifyRequest {
+  files?: { [fieldname: string]: MulterFile[] };
+}
+
+export interface ImageAndContent {
+  imageUrl: string;
+  content: string;
+}
+
 
 export const RelationshipController = {
-  async createRelationship(request: FastifyRequest, reply: FastifyReply) {
-    const relationshipData = relationshipSchema.parse(request.body);
-    const relationship = await relationshipServices.createRelationShip(relationshipData);
-    return reply.status(201).send(relationship);
+  async createRelationship(request: MulterRequest, reply: FastifyReply) {
+    let relationshipData = relationshipSchema.parse(request.body);
+    let userId: string;
+    let relationShipId: string;
+
+    if (typeof relationshipData.content === "string") {
+      relationshipData.content = JSON.parse(relationshipData.content);
+    }
+    
+    try{
+      const user = await createUser({
+        email: relationshipData.userEmail,
+        role: Role.USER,
+      });
+      userId = user.id;
+    } catch(err){
+      console.log(err);
+      return reply.status(400).send({ message: "Erro ao criar Usuário" });
+    }
+
+    try{
+      const relationship = await relationshipServices.createRelationShip(relationshipData, userId);
+      relationShipId = relationship.id;
+    }catch (err){
+      console.log(err);
+      return reply.status(400).send({ message: "Erro ao criar Relationship" });
+    }
+
+    
+    const files: MulterFile[] = [];
+    const fileFields = ['file1', 'file2', 'file3', 'file4', 'file5', 'file6', 'file7', 'file8', 'file9', 'file10'];
+    fileFields.forEach(field => {
+      if (request.files && request.files[field]) {
+        files.push(request.files[field][0]);
+      }
+    });
+
+    try{
+      const downloadURLs = await uploadToFirebase(files);
+      const imagesAndContents: ImageAndContent[] = downloadURLs.map((url, index) => {
+        return {
+          imageUrl: url,
+          content: relationshipData.content[index],
+        };
+      });
+
+      const imageResult = imagesAndContents.forEach(async (imageAndContent) => {
+        await createImage(imageAndContent, relationShipId);
+      });
+    } catch (error) {
+      console.log(error);
+      return reply.status(400).send({ message: "Erro ao criar imagem" });
+    }
+    const createdRelationship = await relationshipServices.getRelationshipById(relationShipId);
+    return reply.status(201).send(createdRelationship);
   },
+
 
   async getRelationshipById(request: FastifyRequest, reply: FastifyReply) {
     const { id } = request.params as { id: string };

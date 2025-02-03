@@ -21,36 +21,51 @@ enum Plans {
 model User {
   id            String          @id @default(uuid())
   email         String          @unique
-  password      String
-  role          Role            @default(USER)
   createdAt     DateTime        @default(now()) @map("created_at")
   updatedAt     DateTime        @updatedAt @map("updated_at")
-  Relationships Relationships[]
+  relationships Relationships[]
+  role          Role            @default(USER)
 
   @@map("users")
 }
 
 model Relationships {
-  id        String     @id @default(uuid())
-  userId    String
-  paymentId String
-  user      User       @relation(fields: [userId], references: [id])
-  createdAt DateTime   @default(now()) @map("created_at")
-  updatedAt DateTime   @updatedAt @map("updated_at")
-  Payments  Payments[]
+  id          String    @id @default(uuid())
+  images      Images[]
+  videoLink   String?
+  description String
+  userId      String
+  paymentId   String?
+  user        User      @relation(fields: [userId], references: [id])
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  Payments    Payments? @relation
+  Plan        Plans     @default(BASIC)
 
   @@map("relationhips")
 }
 
+model Images {
+  id             String        @id @default(uuid())
+  imageUrl       String
+  contentDesc    String
+  relationshipId String
+  relationship   Relationships @relation(fields: [relationshipId], references: [id])
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  @@map("images")
+}
+
 model Payments {
-  id           String        @id @default(uuid())
-  relationShip String
-  relationship Relationships @relation(fields: [relationShip], references: [id], onDelete: Cascade)
-  plan         Plans         @default(BASIC)
-  amount       Float
-  status       String        @default("pending")
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
+  id             String        @id @default(uuid())
+  relationShipId String        @unique
+  relationship   Relationships @relation(fields: [relationShipId], references: [id])
+  plan           Plans         @default(BASIC)
+  amount         Float
+  status         String        @default("pending")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
 
   @@map("payments")
 }

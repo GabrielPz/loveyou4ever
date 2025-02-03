@@ -11,18 +11,12 @@ export const authService = {
       select: {
         id: true,
         email: true,
-        password: true,
         role: true,
       },
     });
 
     if (!user) {
       throw new Error("Usuário não encontrado");
-    }
-
-    const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) {
-      throw new Error("Senha inválida");
     }
 
     const chaveSecreta = process.env.SECRET_KEY_JWT;
