@@ -1,15 +1,14 @@
 import { prisma } from "../lib/prisma";
-import { User } from "@prisma/client";
+import { Role, User } from "@prisma/client";
 import { UserDTO } from "../schemas/UserSchemas";
 import bcrypt from "bcrypt";
 
 export const userService = {
   async createUser(data: UserDTO): Promise<User> {
-    const hashedPassword = await bcrypt.hash(data.password, 10);
     return prisma.user.create({
       data: {
-        ...data,
-        password: hashedPassword,
+        email: data.email,
+        role: data?.role || Role.USER,
       },
     });
   },

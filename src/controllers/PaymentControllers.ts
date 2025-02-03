@@ -9,6 +9,12 @@ export const paymentController = {
     return reply.status(201).send(payment);
   },
 
+
+  async createPayment2(request: FastifyRequest, reply: FastifyReply) {
+    const paymentData = paymentSchema.parse(request.body);
+    const payment = await paymentService.createPayment(paymentData);
+    return reply.status(201).send(payment);
+  },
   async getAllPayments(request: FastifyRequest, reply: FastifyReply) {
     const payments = await paymentService.getAllPayments();
     return reply.status(200).send(payments);
