@@ -47,7 +47,7 @@ export async function relationshipRoutes(app: FastifyInstance) {
         tags: ["Relationships"],
         params: z.object({ id: z.string().uuid() }),
         response: {
-          200: relationshipResponseSchema,
+          200: z.array(relationshipResponseSchema),
           404: z.object({ message: z.string() }),
         },
       },
@@ -62,7 +62,7 @@ export async function relationshipRoutes(app: FastifyInstance) {
         summary: "Get All relationships",
         tags: ["Relationships"],
         response: {
-          200: z.any(),
+          200: z.array(relationshipResponseSchema),
         },
       },
     },

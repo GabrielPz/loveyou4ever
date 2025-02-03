@@ -36,10 +36,10 @@ export const paymentSchema = z.object({
 // Schema principal do relacionamento
 export const relationshipResponseSchema = z.object({
   id: z.string().uuid().optional(),
-  videoLink: z.string().url().optional(),
+  videoLink: z.string().optional().nullable(),
   description: z.string().optional(),
   userId: z.string().uuid().optional(),
-  paymentId: z.string().uuid().optional(),
+  paymentId: z.string().uuid().optional().nullable(),
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
   plan: z.string().optional(),
@@ -47,7 +47,7 @@ export const relationshipResponseSchema = z.object({
   // Relações
   user: userSchema.optional(),
   images: z.array(imageSchema).optional(),
-  Payments: paymentSchema.optional(),
+  Payments: paymentSchema.optional().nullable(),
 });
 
 export const relationshipSchema = z.object({
