@@ -28,8 +28,6 @@ export async function paymentRoutes(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().get(
     "/payments",
     {
-      preHandler: [autenticarToken, checkRole(["ADMIN"])],
-
       schema: {
         summary: "Get All Payments",
         tags: ["Payments"],

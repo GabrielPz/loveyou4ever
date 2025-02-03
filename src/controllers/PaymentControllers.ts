@@ -1,6 +1,4 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { userService } from "../services/UserServices";
-import { userSchema } from "../schemas/UserSchemas";
 import { paymentSchema } from "../schemas/PaymentSchema";
 import { paymentService } from "../services/PaymentServices";
 

@@ -10,7 +10,6 @@ export const authService = {
       where: { email },
       select: {
         id: true,
-        name: true,
         email: true,
         password: true,
         role: true,
@@ -36,7 +35,6 @@ export const authService = {
     return {
       token,
       id: user.id,
-      name: user.name,
       email: user.email,
       role: user.role,
     };
@@ -47,10 +45,8 @@ export const authService = {
       where: { id: userId },
       select: {
         id: true,
-        name: true,
         email: true,
         role: true,
-        paid: true,
       },
     });
 

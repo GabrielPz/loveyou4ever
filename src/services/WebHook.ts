@@ -25,12 +25,12 @@ export async function Webhook(app: FastifyInstance) {
         const externalReference = response.data.external_reference;
         const status = response.data.status;
 
-        const searchUser = await prisma.user.update({
+        const searchPayment = await prisma.payments.update({
           where: {
             id: externalReference,
           },
           data: {
-            paid: status === "paid",
+            status: status,
           },
         });
 
