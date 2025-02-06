@@ -9,20 +9,21 @@ import { paymentController } from "../controllers/PaymentControllers";
 const { autenticarToken, checkRole } = authController;
 
 export async function paymentRoutes(app: FastifyInstance) {
+  
   app.withTypeProvider<ZodTypeProvider>().post(
-    "/payments",
+    "/webhook",
     {
       schema: {
-        summary: "Create Payment",
+        summary: "Webhook Payment",
         tags: ["Payments"],
-        body: paymentSchema,
+        body: z.any(),
         response: {
-          201: paymentSchemaResponse,
+          200: z.object({ message: z.string() }),
           400: z.object({ message: z.string() }),
         },
       },
     },
-    paymentController.createPayment
+    paymentController.webhook
   );
 
   app.withTypeProvider<ZodTypeProvider>().get(

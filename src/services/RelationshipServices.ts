@@ -16,7 +16,9 @@ export const relationshipServices = {
 
   async getRelationshipById(id: string): Promise<Relationships | null> {
     return prisma.relationships.findUnique({
-      where: { id },
+      where: { 
+        id: id,
+       },
     });
   },
 

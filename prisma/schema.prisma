@@ -18,6 +18,12 @@ enum Plans {
   SUPER_PREMIUM
 }
 
+enum PaymenStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
 model User {
   id            String          @id @default(uuid())
   email         String          @unique
@@ -30,17 +36,18 @@ model User {
 }
 
 model Relationships {
-  id          String    @id @default(uuid())
+  id          String       @id @default(uuid())
   images      Images[]
   videoLink   String?
   description String
   userId      String
   paymentId   String?
-  user        User      @relation(fields: [userId], references: [id])
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
-  Payments    Payments? @relation
-  Plan        Plans     @default(BASIC)
+  status      PaymenStatus @default(PENDING)
+  user        User         @relation(fields: [userId], references: [id])
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  Payments    Payments?    @relation
+  Plan        Plans        @default(BASIC)
 
   @@map("relationhips")
 }
@@ -62,8 +69,7 @@ model Payments {
   relationShipId String        @unique
   relationship   Relationships @relation(fields: [relationShipId], references: [id])
   plan           Plans         @default(BASIC)
-  amount         Float
-  status         String        @default("pending")
+  status         PaymenStatus  @default(PENDING)
   createdAt      DateTime      @default(now()) @map("created_at")
   updatedAt      DateTime      @updatedAt @map("updated_at")
 

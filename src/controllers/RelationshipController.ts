@@ -5,6 +5,7 @@ import multer from "multer";
 import { uploadToFirebase } from "../services/FirebaseServices";
 import {userService} from "../services/UserServices";
 import {imageServices} from "../services/ImageServices";
+import {paymentService} from "../services/PaymentServices";
 import { Role } from "@prisma/client";
 const {
   createUser
@@ -12,6 +13,9 @@ const {
 const {
   createImage
 } = imageServices;
+const {
+  createPayment
+} = paymentService;
 
 const upload = multer({ storage: multer.memoryStorage() });
 interface MulterFile {
@@ -50,7 +54,6 @@ export const RelationshipController = {
       });
       userId = user.id;
     } catch(err){
-      console.log(err);
       return reply.status(400).send({ message: "Erro ao criar Usuário" });
     }
 
@@ -58,7 +61,6 @@ export const RelationshipController = {
       const relationship = await relationshipServices.createRelationShip(relationshipData, userId);
       relationShipId = relationship.id;
     }catch (err){
-      console.log(err);
       return reply.status(400).send({ message: "Erro ao criar Relationship" });
     }
 
@@ -84,11 +86,18 @@ export const RelationshipController = {
         await createImage(imageAndContent, relationShipId);
       });
     } catch (error) {
-      console.log(error);
       return reply.status(400).send({ message: "Erro ao criar imagem" });
     }
-    const createdRelationship = await relationshipServices.getRelationshipById(relationShipId);
-    return reply.status(201).send(createdRelationship);
+
+    try{
+      const paymentResult = await createPayment({
+        plan: relationshipData.plan,
+        relationshipId: relationShipId,
+      });
+      return reply.status(201).send({ redirect_url:  paymentResult.redirect_url});
+    }catch(err){
+      return reply.status(400).send({ message: "Erro ao criar link de pagamento" });
+    }
   },
 
 
@@ -97,6 +106,9 @@ export const RelationshipController = {
     const relationship = await relationshipServices.getRelationshipById(id);
     if (!relationship) {
       return reply.status(404).send({ message: "Relacionamento não encontrado" });
+    }
+    if(relationship.status !== "PAID"){
+      return reply.status(400).send({ message: "Relacionamento não está pago" });
     }
     return reply.status(200).send(relationship);
   },
