@@ -1,33 +1,70 @@
 import { prisma } from "../lib/prisma";
 import { Payments } from "@prisma/client";
 import { PaymentDTO, PaymentResponseDTO } from "../schemas/PaymentSchema";
-import Stripe from 'stripe';
-const stripe = new Stripe('sk_test_51QoXWMErz5C39pOb8Dc7lUDCx1VmSitD1uuL80OSfa7nHECkFmZtqYWTfw3dXGOyNHRA5UGuIspfLNw22m42w53C00FYh9ML5O', {
-  apiVersion: '2025-01-27.acacia',
+import { Payment as MercadoPagoPayment, MercadoPagoConfig, Preference } from "mercadopago";
+import { relationshipServices } from "./RelationshipServices";
+
+const client = new MercadoPagoConfig({
+  accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN || "",
 });
-const DOMAIN = 'http://localhost:4242';
+const preference = new Preference(client);
+
 
 export const paymentService = {
   async createPayment(data: PaymentDTO): Promise<PaymentResponseDTO> {
+
+    const {
+      relationshipId,
+      plan,
+    } = data;
+    const relationship = await relationshipServices.getRelationshipById(relationshipId || "");
+    if (!relationship) {
+      throw new Error(
+        `Relacionamento não encontrado com o ID: ${relationshipId}`
+      );
+    }
+
+    let transactionAmmount = 0.1;
+    let title = "Prata";
+
+    if (plan === "PREMIUM") {
+      transactionAmmount = 0.15;
+      title = "Ouro";
+    }  
+    if (plan === "SUPER_PREMIUM") {
+      transactionAmmount = 0.20;
+      title = "Diamante";
+    }
+
+    const external_reference = relationshipId;
+  
     try {
-      const session = await stripe.checkout.sessions.create({
-        line_items: [
-          {
-            price: 'price_1QoXdYErz5C39pObuoZ3ZrkX', // Substitua pelo preço correto do Stripe
-            quantity: 1,
-          },
-        ],
-        mode: 'payment',
-        client_reference_id: data.relationshipId,
-        success_url: `${DOMAIN}?success=true`,
-        cancel_url: `${DOMAIN}?canceled=true`,
+      const response = await preference.create({
+        body:{
+          external_reference: external_reference,
+          notification_url: process.env.WEBHOOK_NOTIFICATION_URL || "",
+          // back_urls: {
+          //   success: process.env.WEBHOOK_SUCCESS_URL || "",
+          //   pending: process.env.WEBHOOK_PENDING_URL || "",
+          //   failure: process.env.WEBHOOK_FAILURE_URL || "",
+          // },
+          items: [
+            {
+              id: external_reference,
+              currency_id: "BRL",
+              title: title,
+              quantity: 1,
+              unit_price: transactionAmmount
+            }
+          ],
+        },
+        requestOptions: { idempotencyKey: external_reference },
       });
-      
       return {
-        redirect_url: session.url || '',
+        redirect_url: response?.sandbox_init_point || '',
       };
     } catch (error: any) {
-      throw new Error("Erro ao criar pagamento: " + error.message);
+      throw new Error("Erro ao criar pagamento:" + error.message);
     }
   },
 

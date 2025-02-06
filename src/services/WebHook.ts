@@ -9,20 +9,19 @@ export async function Webhook(app: FastifyInstance) {
     .withTypeProvider<ZodTypeProvider>()
     .post("/webhook", { config: { rawBody: true } }, async (request, reply) => {
       try {
-        const { data } = request.body as any;
-        const { id } = data;
-        const type = (request.body as any).type;
+        const data = request.body as any;
+        const id = data.data?.id;
 
         const response = await axios.get(
           `https://api.mercadopago.com/v1/payments/${id}`,
           {
             headers: {
-              Authorization: `Bearer ${process.env.MERCADO_PAGO_API_KEY || ""}`,
+              Authorization: `Bearer ${process.env.MERCADO_PAGO_ACCESS_TOKEN || ""}`,
             },
           }
         );
 
-        const externalReference = response.data.external_reference;
+        const externalReference = response.data.external_reference || "";
         const status = response.data.status;
 
         const searchPayment = await prisma.payments.update({
@@ -30,11 +29,30 @@ export async function Webhook(app: FastifyInstance) {
             id: externalReference,
           },
           data: {
-            status: status,
+            status: status === "approved" || status === "APPRO" ? "PAID" : "PENDING",
           },
         });
 
-        return reply.status(400).send({ message: "Usuário não encontrado" });
+        const searchRelaitonship = await prisma.relationships.findFirst({
+          where: {
+            paymentId: externalReference,
+          },
+        });
+
+        if(!searchRelaitonship) {
+          return reply.status(400).send({ message: "Erro ao processar ID de pagamento!" });
+        }
+
+        const updateRelationship = await prisma.relationships.update({
+          where: {
+            id: searchRelaitonship.id,
+          },
+          data: {
+            status: status === "approved" || status === "APPRO" ? "PAID" : "PENDING",
+          },
+        })
+
+        return reply.status(200).send({ message: "Pagamento atualizado com sucesso!" });
       } catch (error: any) {
         return reply.status(400).send({ message: error.message });
       }

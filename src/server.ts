@@ -16,6 +16,7 @@ import fastifyRawBody from "fastify-raw-body";
 import { errorHandler } from "./middlewares/ErrorMiddleware";
 import { prisma } from "./lib/prisma";
 import fastifyMulter from 'fastify-multer';
+import { Webhook } from "./services/WebHook";
 const app = fastify();
 
 // aqui determina qual o endereco do front-end que pode consumir nosso servidor
@@ -57,9 +58,10 @@ app.register(fastifyRawBody, {
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
 app.setErrorHandler(errorHandler);
-app.register(paymentRoutes, { prefix: "/api/v1" });
+// app.register(paymentRoutes, { prefix: "/api/v1" });
 app.register(relationshipRoutes, { prefix: "/api/v1" });
 app.register(authRoutes, { prefix: "/api/v1" });
+app.register(Webhook, { prefix: "/api/v1" });
 
 app.listen({ port: 8000, host: "0.0.0.0" }).then(async () => {
   console.log("Server is running on port 8000");

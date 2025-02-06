@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const paymentSchema = z.object({
   relationshipId: z.string(),
-  priceId: z.string().min(1, { message: "O preço é obrigatório." }).optional(),
+  plan: z.enum(["BASIC", "PREMIUM", "SUPER_PREMIUM"]),
 });
 
 export const paymentSchemaResponse = z.object({
