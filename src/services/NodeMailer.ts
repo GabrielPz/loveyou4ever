@@ -1,9 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 import QRCode from 'qrcode';
-import { prisma } from "../lib/prisma";
-import { ImageAndContent } from "../controllers/RelationshipController";
 import { transporter } from "../lib/nodeMailer";
+
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+// 🔹 Definir __dirname para funcionar em ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export const mailService = {
   async sendEmail(clientEmail: string, relationShipId: string): Promise<{ message: string; messageId: string; error: boolean }> {
@@ -15,7 +20,7 @@ export const mailService = {
       const qrCodeBase64 = await QRCode.toDataURL(siteUrl);
 
       // 🔹 Ler o template do e-mail
-      const htmlFilePath = path.join(__dirname, '../../mails/successfull-purchase.html');
+      const htmlFilePath = path.join(__dirname, '../mails/successfull-purchase.html');
       let htmlTemplate = fs.readFileSync(htmlFilePath, 'utf8');
 
       // 🔹 Substituir placeholders no HTML
@@ -51,12 +56,12 @@ export const mailService = {
   async sendConfirmPayment(payment_link: string, clientEmail: string): Promise<{ message: string; messageId: string; error: boolean }> {
     try {
 
-      const htmlFilePath = path.join(__dirname, '../../mails/purchase-link.html');
+      const htmlFilePath = path.join(__dirname, '../mails/purchase-link.html');
       let htmlTemplate = fs.readFileSync(htmlFilePath, 'utf8');
 
       htmlTemplate = htmlTemplate
         .replace('{{CLIENT_NAME}}', 'Cliente')
-        .replace('{{LINK}}', `<a href="${payment_link}" class="button">Finalize a compra, clicando aqui!</a>`);
+        .replace('{{LINK}}', `${payment_link}`);
 
       // 🔹 Enviar e-mail
       const mail = await transporter.sendMail({

@@ -54,6 +54,8 @@ export const relationshipSchema = z.object({
   userEmail: z.string().email(),
   content: z.string(),
   videoLink: z.string().optional(),
+  relationshipDate: z.any(),
+  relationshipName: z.string(),
   description: z.string(),
   plan: z.enum(["BASIC", "PREMIUM", "SUPER_PREMIUM"]),
 });

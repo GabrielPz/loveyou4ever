@@ -10,7 +10,8 @@ export const relationshipServices = {
         Plan: data.plan,
         videoLink: data.videoLink,
         userId: userId,
-        
+        relationshipDate: data.relationshipDate,
+        relationshipName: data.relationshipName,
       },
     });
   },
