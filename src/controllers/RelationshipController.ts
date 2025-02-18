@@ -53,8 +53,9 @@ export const RelationshipController = {
         role: Role.USER,
       });
       userId = user.id;
-    } catch(err){
-      return reply.status(400).send({ message: "Erro ao criar Usuário" });
+    } catch(err: any){
+      console.log(err)
+      return reply.status(400).send({ message: err.message || "Erro ao criar Usuário" });
     }
 
     try{

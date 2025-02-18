@@ -63,6 +63,6 @@ app.register(relationshipRoutes, { prefix: "/api/v1" });
 app.register(authRoutes, { prefix: "/api/v1" });
 app.register(Webhook, { prefix: "/api/v1" });
 
-app.listen({ port: 8000, host: "0.0.0.0" }).then(async () => {
-  console.log("Server is running on port 8000");
+app.listen({ port: 3000, host: "0.0.0.0" }).then(async () => {
+  console.log("Server is running on port 3000");
 });

@@ -10,6 +10,7 @@ export const relationshipServices = {
         Plan: data.plan,
         videoLink: data.videoLink,
         userId: userId,
+        
       },
     });
   },
@@ -19,6 +20,11 @@ export const relationshipServices = {
       where: { 
         id: id,
        },
+      include:{
+        images: true,
+        Payments: true,
+        user: true,
+      }
     });
   },
 
