@@ -7,6 +7,7 @@ import {userService} from "../services/UserServices";
 import {imageServices} from "../services/ImageServices";
 import {paymentService} from "../services/PaymentServices";
 import { Role } from "@prisma/client";
+import { mailService } from "../services/NodeMailer";
 const {
   createUser
 } = userService;
@@ -53,8 +54,9 @@ export const RelationshipController = {
         role: Role.USER,
       });
       userId = user.id;
-    } catch(err){
-      return reply.status(400).send({ message: "Erro ao criar Usuário" });
+    } catch(err: any){
+      console.log(err)
+      return reply.status(400).send({ message: err.message || "Erro ao criar Usuário" });
     }
 
     try{
@@ -89,15 +91,19 @@ export const RelationshipController = {
       return reply.status(400).send({ message: "Erro ao criar imagem" });
     }
 
+    
+
     try{
       const paymentResult = await createPayment({
         plan: relationshipData.plan,
         relationshipId: relationShipId,
       });
+      const sendConfirmPaymentToEmail = await mailService.sendConfirmPayment(paymentResult.redirect_url, relationshipData.userEmail);
       return reply.status(201).send({ redirect_url:  paymentResult.redirect_url});
     }catch(err){
       return reply.status(400).send({ message: "Erro ao criar link de pagamento" });
     }
+   
   },
 
 

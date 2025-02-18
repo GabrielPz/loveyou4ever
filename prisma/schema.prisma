@@ -36,18 +36,20 @@ model User {
 }
 
 model Relationships {
-  id          String       @id @default(uuid())
-  images      Images[]
-  videoLink   String?
-  description String
-  userId      String
-  paymentId   String?
-  status      PaymenStatus @default(PENDING)
-  user        User         @relation(fields: [userId], references: [id])
-  createdAt   DateTime     @default(now()) @map("created_at")
-  updatedAt   DateTime     @updatedAt @map("updated_at")
-  Payments    Payments?    @relation
-  Plan        Plans        @default(BASIC)
+  id               String       @id @default(uuid())
+  images           Images[]
+  videoLink        String?
+  description      String
+  userId           String
+  relationshipDate DateTime
+  relationshipName String
+  paymentId        String?
+  status           PaymenStatus @default(PENDING)
+  user             User         @relation(fields: [userId], references: [id])
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @updatedAt @map("updated_at")
+  Payments         Payments?    @relation
+  Plan             Plans        @default(BASIC)
 
   @@map("relationhips")
 }

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
 import axios from "axios";
 import { prisma } from "../lib/prisma";
+import { mailService } from "./NodeMailer";
 
 export async function Webhook(app: FastifyInstance) {
   app
@@ -51,6 +52,14 @@ export async function Webhook(app: FastifyInstance) {
             status: status === "approved" || status === "APPRO" ? "PAID" : "PENDING",
           },
         })
+
+        const searchUser = await prisma.user.findFirst({
+          where: {
+            id: searchRelaitonship.userId,
+          },
+        });
+
+        const sendQRCode = await mailService.sendEmail(searchUser?.email || '',searchRelaitonship.id);
 
         return reply.status(200).send({ message: "Pagamento atualizado com sucesso!" });
       } catch (error: any) {
