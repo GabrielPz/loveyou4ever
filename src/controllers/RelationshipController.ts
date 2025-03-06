@@ -70,6 +70,12 @@ export const RelationshipController = {
       return reply.status(400).send({ message: "Erro ao criar Relationship" });
     }
 
+    try{
+      const paymentRegister = await paymentService.registerPayment(relationShipId);
+    }catch (err){
+      return reply.status(400).send({ message: "Erro ao registrar Pagamento" });
+    }
+
     
     const files: MulterFile[] = [];
     const fileFields = ['file1', 'file2', 'file3', 'file4', 'file5', 'file6', 'file7', 'file8', 'file9', 'file10'];

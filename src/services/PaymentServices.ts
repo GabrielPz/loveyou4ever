@@ -68,4 +68,13 @@ export const paymentService = {
       },
     });
   },
+
+  async registerPayment(relationshipId: string): Promise<Payments> {
+    return prisma.payments.create({
+     data: {
+      relationShipId: relationshipId,
+      status: "PENDING",
+     }
+    });
+  },
 };
