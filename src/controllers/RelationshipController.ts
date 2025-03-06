@@ -71,7 +71,7 @@ export const RelationshipController = {
     }
 
     try{
-      const paymentRegister = await paymentService.registerPayment(relationShipId);
+      const paymentRegister = await paymentService.registerPayment(relationShipId, relationshipData.plan);
     }catch (err){
       return reply.status(400).send({ message: "Erro ao registrar Pagamento" });
     }

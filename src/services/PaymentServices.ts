@@ -69,11 +69,12 @@ export const paymentService = {
     });
   },
 
-  async registerPayment(relationshipId: string): Promise<Payments> {
+  async registerPayment(relationshipId: string, plan:  "BASIC" | "PREMIUM" | "SUPER_PREMIUM"): Promise<Payments> {
     return prisma.payments.create({
      data: {
       relationShipId: relationshipId,
       status: "PENDING",
+      plan: plan,
      }
     });
   },
