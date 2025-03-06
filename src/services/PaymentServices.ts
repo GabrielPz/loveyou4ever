@@ -5,9 +5,9 @@ import { Payment as MercadoPagoPayment, MercadoPagoConfig, Preference } from "me
 import { relationshipServices } from "./RelationshipServices";
 
 const client = new MercadoPagoConfig({
-  accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN || "",
+  accessToken:  process.env.MERCADO_PAGO_ACCESS_TOKEN || "",
 });
-const preference = new Preference(client);
+const payments = new MercadoPagoPayment(client);
 
 
 export const paymentService = {
@@ -16,7 +16,9 @@ export const paymentService = {
     const {
       relationshipId,
       plan,
+      payer,
     } = data;
+    
     const relationship = await relationshipServices.getRelationshipById(relationshipId || "");
     if (!relationship) {
       throw new Error(
@@ -24,44 +26,35 @@ export const paymentService = {
       );
     }
 
-    let transactionAmmount = 0.1;
+    let transactionAmmount = 1;
     let title = "Prata";
 
     if (plan === "PREMIUM") {
-      transactionAmmount = 0.15;
+      transactionAmmount = 1.15;
       title = "Ouro";
     }  
     if (plan === "SUPER_PREMIUM") {
-      transactionAmmount = 0.20;
+      transactionAmmount = 1.20;
       title = "Diamante";
     }
 
     const external_reference = relationshipId;
   
     try {
-      const response = await preference.create({
+      const response = await payments.create({
         body:{
           external_reference: external_reference,
           notification_url: process.env.WEBHOOK_NOTIFICATION_URL || "",
-          // back_urls: {
-          //   success: process.env.WEBHOOK_SUCCESS_URL || "",
-          //   pending: process.env.WEBHOOK_PENDING_URL || "",
-          //   failure: process.env.WEBHOOK_FAILURE_URL || "",
-          // },
-          items: [
-            {
-              id: external_reference,
-              currency_id: "BRL",
-              title: title,
-              quantity: 1,
-              unit_price: transactionAmmount
-            }
-          ],
+          transaction_amount: transactionAmmount,
+          payment_method_id: 'pix',
+          description: "Pagamento do plano: " + title,
+          payer: payer
         },
         requestOptions: { idempotencyKey: external_reference },
       });
       return {
-        redirect_url: response?.sandbox_init_point || '',
+        qr_code: response.point_of_interaction?.transaction_data?.qr_code,
+        ticket_url: response.point_of_interaction?.transaction_data?.ticket_url,
       };
     } catch (error: any) {
       throw new Error("Erro ao criar pagamento:" + error.message);

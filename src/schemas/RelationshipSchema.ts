@@ -60,6 +60,19 @@ export const relationshipSchema = z.object({
   plan: z.enum(["BASIC", "PREMIUM", "SUPER_PREMIUM"]),
 });
 
+// payer: z
+//     .object({
+//       email: z
+//         .string()
+//         .email({ message: "O email do pagador deve ser válido." }),
+//       identification: z
+//         .object({
+//           type: z.enum(["CPF", "CNPJ"]).optional(),
+//           number: z
+//             .string()
+//             .min(1, { message: "O número de identificação é obrigatório." }),
+//         })
+//     })
 
 
 export type RelationshipResponseDTO = z.infer<typeof relationshipResponseSchema>;

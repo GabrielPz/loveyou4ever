@@ -44,13 +44,17 @@ export const RelationshipController = {
     let userId: string;
     let relationShipId: string;
 
+    const payer = {
+      email: relationshipData.userEmail,
+    };
+
     if (typeof relationshipData.content === "string") {
       relationshipData.content = JSON.parse(relationshipData.content);
     }
     
     try{
       const user = await createUser({
-        email: relationshipData.userEmail,
+        email: payer.email,
         role: Role.USER,
       });
       userId = user.id;
@@ -97,9 +101,10 @@ export const RelationshipController = {
       const paymentResult = await createPayment({
         plan: relationshipData.plan,
         relationshipId: relationShipId,
+        payer: payer,
       });
-      const sendConfirmPaymentToEmail = await mailService.sendConfirmPayment(paymentResult.redirect_url, relationshipData.userEmail);
-      return reply.status(201).send({ redirect_url:  paymentResult.redirect_url});
+      const sendConfirmPaymentToEmail = await mailService.sendConfirmPayment(paymentResult?.ticket_url || '-', payer.email);
+      return reply.status(201).send({ ticket_url:  paymentResult.ticket_url, qr_code:  paymentResult.qr_code});
     }catch(err){
       return reply.status(400).send({ message: "Erro ao criar link de pagamento" });
     }

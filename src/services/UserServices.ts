@@ -5,10 +5,17 @@ import bcrypt from "bcrypt";
 
 export const userService = {
   async createUser(data: UserDTO): Promise<User> {
-    return prisma.user.create({
-      data: {
+    return prisma.user.upsert({
+      create: {
         email: data.email,
         role: data?.role || Role.USER,
+      },
+      update: {
+        email: data.email,
+        role: data?.role || Role.USER,
+      },
+      where: {
+        email: data.email,
       },
     });
   },
