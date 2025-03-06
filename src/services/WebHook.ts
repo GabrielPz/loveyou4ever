@@ -63,6 +63,7 @@ export async function Webhook(app: FastifyInstance) {
 
         return reply.status(200).send({ message: "Pagamento atualizado com sucesso!" });
       } catch (error: any) {
+        console.log(error);
         return reply.status(400).send({ message: error.message });
       }
     });
