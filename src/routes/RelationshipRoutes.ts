@@ -31,8 +31,12 @@ export async function relationshipRoutes(app: FastifyInstance) {
         tags: ["Relationships"],
         consumes: ["multipart/form-data"],
         response: {
-          201: z.object({ redirect_url: z.string() }),
-          400: z.object({ message: z.string() }),
+          201: z.object({ 
+            qr_code: z.string().optional(),
+            ticket_url: z.string().optional(), 
+          }),
+          400: z.any(),
+          // 400: z.object({ message: z.string() }),
         },
       },
     },
