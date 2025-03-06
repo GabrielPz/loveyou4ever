@@ -25,12 +25,12 @@ export const imageSchema = z.object({
 // Schema dos pagamentos
 export const paymentSchema = z.object({
   id: z.string().uuid(),
-  relationShipId: z.string().uuid(),
-  plan: PlansEnum,
-  amount: z.number(),
-  status: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  relationShipId: z.string().uuid().optional(),
+  plan: PlansEnum.optional(),
+  amount: z.number().optional(),
+  status: z.string().optional(),
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
 });
 
 // Schema principal do relacionamento
