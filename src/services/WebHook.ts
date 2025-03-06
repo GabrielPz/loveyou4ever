@@ -27,7 +27,7 @@ export async function Webhook(app: FastifyInstance) {
 
         const searchPayment = await prisma.payments.update({
           where: {
-            id: externalReference,
+            relationShipId: externalReference,
           },
           data: {
             status: status === "approved" || status === "APPRO" ? "PAID" : "PENDING",
@@ -36,22 +36,26 @@ export async function Webhook(app: FastifyInstance) {
 
         const searchRelaitonship = await prisma.relationships.findFirst({
           where: {
-            paymentId: externalReference,
+            id: externalReference,
           },
         });
 
         if(!searchRelaitonship) {
-          return reply.status(400).send({ message: "Erro ao processar ID de pagamento!" });
+          return reply.status(400).send({ message: "Erro ao processar ID de relacionamento!" });
         }
 
         const updateRelationship = await prisma.relationships.update({
           where: {
-            id: searchRelaitonship.id,
+            id: externalReference,
           },
           data: {
             status: status === "approved" || status === "APPRO" ? "PAID" : "PENDING",
           },
         })
+
+        if(!updateRelationship) {
+          return reply.status(400).send({ message: "Erro ao processar ID de relacionamento!" });
+        }
 
         const searchUser = await prisma.user.findFirst({
           where: {
