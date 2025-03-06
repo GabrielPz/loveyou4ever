@@ -11,7 +11,7 @@ export async function Webhook(app: FastifyInstance) {
     .post("/webhook", { config: { rawBody: true } }, async (request, reply) => {
       try {
         const data = request.body as any;
-        const id = data.data?.id;
+        const id = data.data?.id || data?.id || "";
 
         const response = await axios.get(
           `https://api.mercadopago.com/v1/payments/${id}`,
@@ -63,6 +63,7 @@ export async function Webhook(app: FastifyInstance) {
 
         return reply.status(200).send({ message: "Pagamento atualizado com sucesso!" });
       } catch (error: any) {
+        console.log(error);
         return reply.status(400).send({ message: error.message });
       }
     });
