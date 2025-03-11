@@ -14,14 +14,15 @@ export const mailService = {
   async sendEmail(clientEmail: string, relationShipId: string): Promise<{ message: string; messageId: string; error: boolean }> {
     try {
       const siteUrl = `${process.env.FRONT_URL}/love/${relationShipId}`;
-      const qrCodeBase64 = await QRCode.toDataURL(siteUrl);
       const htmlFilePath = path.join(__dirname, '../mails/successfull-purchase.html');
       let htmlTemplate = fs.readFileSync(htmlFilePath, 'utf8');
+
+      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://iloveyou4ever.vercel.app/love/${relationShipId}`;
 
       // 🔹 Substituir placeholders no HTML
       htmlTemplate = htmlTemplate
         .replace('{{CLIENT_NAME}}', 'Cliente')
-        .replace('{{QR_CODE}}', `${qrCodeBase64}`)
+        .replace('{{QR_CODE}}', `${qrCodeUrl}`)
         .replace('{{QR_LINK}}', `${siteUrl}`);
 
       // 🔹 Enviar e-mail
