@@ -44,6 +44,9 @@ export const relationshipResponseSchema = z.object({
   updatedAt: z.date().optional(),
   plan: z.string().optional(),
 
+  relationshipDate: z.date().optional(),
+  relationshipName: z.string().optional(),
+
   // Relações
   user: userSchema.optional(),
   images: z.array(imageSchema).optional(),
