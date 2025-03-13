@@ -21,7 +21,7 @@ const app = fastify();
 
 // aqui determina qual o endereco do front-end que pode consumir nosso servidor
 app.register(fastifyCors, {
-  origin: "https://www.iloveyou4ever.com.br/",
+  origin: ["https://www.iloveyou4ever.com.br", "https://iloveyou4ever.com.br",  "https://www.iloveyou4ever.com.br/"],
 });
 app.register(fastifyMulter.contentParser);
 app.setErrorHandler(errorHandler);
