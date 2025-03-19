@@ -66,8 +66,10 @@ export async function Webhook(app: FastifyInstance) {
             id: searchRelaitonship.userId,
           },
         });
-
-        const sendQRCode = await mailService.sendEmail(searchUser?.email || '',searchRelaitonship.id);
+        
+        if(status === "approved" || status === "APPRO") {
+          const sendQRCode = await mailService.sendEmail(searchUser?.email || '',searchRelaitonship.id);
+        }
 
         return reply.status(200).send({ message: "Pagamento atualizado com sucesso!" });
       } catch (error: any) {
