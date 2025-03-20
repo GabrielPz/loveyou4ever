@@ -26,15 +26,15 @@ export const paymentService = {
       );
     }
 
-    let transactionAmmount = 1;
+    let transactionAmmount = 10;
     let title = "Prata";
 
     if (plan === "PREMIUM") {
-      transactionAmmount = 1.15;
+      transactionAmmount = 15;
       title = "Ouro";
     }  
     if (plan === "SUPER_PREMIUM") {
-      transactionAmmount = 1.20;
+      transactionAmmount = 20;
       title = "Diamante";
     }
 
